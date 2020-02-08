@@ -89,8 +89,64 @@ ON P.customer_id = C.customer_id
 GROUP BY P.customer_id
 ORDER BY C.last_name;
  -- Titles of English language movies that begin with K and Q
-SELECT title
+SELECT F.title
 FROM film AS F INNER JOIN language AS L
+ON F.language_id = L.language_id
+WHERE F.title like "K%" or F.title like "Q%";
+-- Display all actors who appear in the film Alone Trip
+SELECT a.actor_id, a.first_name, a.last_name 
+FROM film_actor as fa
+INNER JOIN actor AS a ON a.actor_id = fa.actor_id
+INNER JOIN film AS f ON f.film_id =fa.film_id 
+WHERE f.title = 'Alone Trip';
+-- Names and email addresses of all Canadian customers
+SELECT c.customer_id,c.first_name,c.last_name,c.email
+-- Identify all movies categorized as family movies
+SELECT *
+FROM category;
+SELECT f.title
+FROM film_category as fc
+INNER JOIN category as c ON fc.category_id = c.category_id
+INNER JOIN film as f ON fc.film_id = f.film_id
+WHERE c.category_id = 8;
+-- Display the most frequently rented movies in descending order
+SELECT f.title, count(f.title) as "Rental Count"
+FROM inventory as i
+INNER JOIN rental AS r ON r.inventory_id = i.inventory_id
+INNER JOIN film as f on f.film_id = i.film_id
+GROUP BY f.title
+ORDER BY count(f.title) DESC;
+-- how much dollars of business did each store bring in
+SELECT st.store_id AS "Store ID", sum(p.amount) AS "Total Sales"
+FROM staff as s
+INNER JOIN payment AS p ON p.staff_id = s.staff_id
+INNER JOIN store AS st ON s.store_id = st.store_id
+GROUP BY st.store_id;
+-- Each store, store ID, city, and country
+-- List the top 5 genres in gross revenue in descending order
+SELECT*
+FROM category as c
+inner join (select f.film_id, f.category_id, i.inventory_id, i.store_id
+			from film_category as f inner join inventory as i
+			on f.film_id = i.film_id) as x
+on x.category_id = c.category_id;
+
+  select z.name, sum(y.amount)
+from (select r.rental_id, r.inventory_id, p.amount, p.payment_id
+          from rental as r inner join payment as p 
+          on p.rental_id = r.rental_id) as y
+inner join 
+        (select c.category_id, c.name, x.film_id, x.inventory_id, x.store_id
+        from category as c
+        inner join (select f.film_id, f.category_id, i.inventory_id, i.store_id 
+                        from film_category as f inner join inventory as i 
+                        on f.film_id = i.film_id) as x
+    on x.category_id = c.category_id) as z
+on y.inventory_id = z.inventory_id
+group by z.name
+order by sum(y.amount) desc; 
+
+
 
 
 
